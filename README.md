@@ -1,5 +1,5 @@
 # Лабораторная работа 6
-Задание 1.1.@Invoke.
+##Задание 1.1.@Invoke.
 Разработайте аннотацию @Invoke, со следующими характеристиками:
 - Целью может быть только МЕТОД
 - Доступна во время исполнения программы
@@ -11,11 +11,11 @@
 
  Структура проекта:
 
- 1. Аннотация @Invoke
+/* 1. Аннотация @Invoke
 
     @Retention(RetentionPolicy.RUNTIME)
     @Target(ElementType.METHOD)
-    
+*/    
 ```java
 import java.lang.annotation.*;
 
