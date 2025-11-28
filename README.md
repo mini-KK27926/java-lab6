@@ -25,7 +25,7 @@ public @interface Invoke {
 }
 ```
 
- 3. Класс InvokeAnnotation с методами:
+###  2. Класс InvokeAnnotation с методами:
     - Несколько методов помечены @Invoke
     - Один из методов приватный (public/private значения не имеют)
 ```java
@@ -48,7 +48,7 @@ public class InvokeAnnotation {
 }
 
 ```
- 4. Обработчик аннотации InvokeProcessor:
+###  3. Обработчик аннотации InvokeProcessor:
     - Использует Reflection API
     - Находит методы с @Invoke
     - Вызывает каждый найденный метод (method.invoke)
@@ -74,7 +74,7 @@ public class InvokeProcessor {
 }
 
 ```
- 5. Главный класс Main:
+ ### 4. Главный класс Main:
     - Создаёт объект InvokeAnnotation
     - Передаёт его в InvokeProcessor.processing(object)
 ```java
@@ -86,7 +86,7 @@ public class Main {
 }
 
 ```
- Результат работы программы:
+### Результат работы программы:
  На экран выводится:
 
     Метод 1 вызван
