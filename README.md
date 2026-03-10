@@ -113,3 +113,62 @@ public @interface Default {
     Class<?> value();
 }
 ```
+###  2. Класс DefaultAnnotation с аннотацией @Default
+    - Аннотация на классе: @Default(String.class)
+    Поля класса:
+    - someNumber — с аннотацией @Default(Integer.class)
+    - anotherNumber — без аннотации
+    - items — с аннотацией @Default(List.class)
+```java
+@Default(String.class)
+public class DefaultAnnotation {
+    @Default(Integer.class)
+    private int someNumber;
+    int anotherNumber;
+
+    @Default(java.util.List.class)
+    private java.util.List<String> items;
+}
+
+```
+###  3. Обработчик аннотации DefaultProcessor:
+    - Использует Reflection API
+    - Выводит тип по умолчанию для класса и каждого поля, где стоит @Default
+    - Игнорирует поля без аннотации
+```java
+public class DefaultProcessor {
+    public static void printDefaultClass(Class<?> clazz) {
+        Default annotation = clazz.getAnnotation(Default.class);
+        if (annotation != null) {
+            System.out.println("Default class: " + annotation.value().getName());
+        }
+
+        for (java.lang.reflect.Field field : clazz.getDeclaredFields()) {
+            Default fieldAnnotation = field.getAnnotation(Default.class);
+            if (fieldAnnotation != null) {
+                System.out.println("Field " + field.getName() + " default class: " + fieldAnnotation.value().getName());
+            }
+        }
+    }
+}
+
+```
+ ### 4. Главный класс Main:
+    - Вызывает обработчик DefaultProcessor для класса DefaultAnnotation
+    - Выводит типы по умолчанию для класса и полей
+```java
+public class Main {
+    public static void main(String[] args) {
+        DefaultProcessor.printDefaultClass(DefaultAnnotation.class);
+    }
+}
+
+```
+### Результат работы программы:
+ На экран выводится:
+    Default class для класса DefaultAnnotation: java.lang.String
+    Default class для поля someNumber: java.lang.Integer
+    Default class для поля items: java.util.List
+    
+Поле anotherNumber не выводится, так как не имеет аннотации @Default
+Класс DefaultAnnotation выводится с типом по умолчанию String
