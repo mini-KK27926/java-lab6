@@ -165,6 +165,7 @@ public class Main {
 
 ```
 ### Результат работы программы:
+
  На экран выводится:
     Default class для класса DefaultAnnotation: java.lang.String
     Default class для поля someNumber: java.lang.Integer
