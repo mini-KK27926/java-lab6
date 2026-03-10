@@ -213,7 +213,20 @@ enum Mode {
     secret — исключено из вывода (@ToString(Mode.NO))
     Аннотация на классе: @ToString
 ```java
+@ToString
+class Person {
+    private String name;
+    private int age;
 
+    @ToString(Mode.NO)
+    private String secret;
+
+    public Person(String name, int age, String secret) {
+        this.name = name;
+        this.age = age;
+        this.secret = secret;
+    }
+}
 ```
 ###  3. Обработчик ToStringProcessor:
     - Использует Reflection API
@@ -262,3 +275,227 @@ public class Main {
  На экран выводится:
 
     Person{name=Елена, age=22}
+    
+## Задание 1.4.@Validate.
+Разработайте аннотацию @Validate, со следующими характеристиками:
+- Целью может быть ТИП или АННОТАЦИЯ
+- Доступна во время исполнения программы
+- Имеет обязательное свойство value, типа Class[]
+Проаннотируйте класс аннотацией @Validate, передав список типов для проверки.
+Реализуйте обработчик, который выводит, какие классы указаны в аннотации.
+
+### 1. Аннотация @Validate
+
+* Применяется к классу или аннотации (`@Target({ElementType.TYPE, ElementType.ANNOTATION_TYPE})`)
+* Доступна во время выполнения (`@Retention(RetentionPolicy.RUNTIME)`)
+* Свойство `value` — массив классов для проверки
+
+```java
+import java.lang.annotation.*;
+
+@Retention(RetentionPolicy.RUNTIME)
+@Target({ElementType.TYPE, ElementType.ANNOTATION_TYPE})
+public @interface Validate {
+    Class<?>[] value();
+}
+```
+
+### 2. Класс ValidateAnnotation с аннотацией @Validate
+
+* Аннотация на классе: `@Validate({String.class, Integer.class, Double.class})`
+
+```java
+@Validate({String.class, Integer.class, Double.class})
+public class ValidateAnnotation { }
+```
+
+### 3. Обработчик ValidateProcessor
+
+* Использует Reflection API
+* Считывает аннотацию `@Validate` и выводит список классов
+
+```java
+public class ValidateProcessor {
+    public static void printValidatedClasses(Class<?> clazz) {
+        Validate annotation = clazz.getAnnotation(Validate.class);
+        if (annotation != null) {
+            System.out.println("Класс " + clazz.getName() + " имеет @Validate с типами:");
+            for (Class<?> type : annotation.value()) {
+                System.out.println(" - " + type.getName());
+            }
+        }
+    }
+}
+```
+
+### 4. Главный класс Main
+
+* Передаёт класс `ValidateAnnotation` в обработчик
+* Выводит список классов из аннотации
+
+```java
+public class Main {
+    public static void main(String[] args) {
+        ValidateProcessor.printValidatedClasses(ValidateAnnotation.class);
+    }
+}
+```
+
+### Результат работы программы
+
+```
+Класс ValidateAnnotation имеет @Validate с типами:
+ - java.lang.String
+ - java.lang.Integer
+ - java.lang.Double
+```
+
+---
+
+## Задание 1.5. @Two
+@Two.
+Разработайте аннотацию @Two, со следующими характеристиками:
+- Целью может быть ТИП
+- Доступна во время исполнения программы
+- Имеет два обязательных свойства: first типа String и second типа int
+Проаннотируйте какой-либо класс аннотацией @Two, передав строковое и числовое значения.
+Реализуйте обработчик, который считывает и выводит значения этих свойств.
+### 1. Аннотация @Two
+
+- Применяется только к классу (`@Target(ElementType.TYPE)`)
+- Доступна во время выполнения (`@Retention(RetentionPolicy.RUNTIME)`)
+- Два обязательных свойства: `first` (String), `second` (int)
+
+```java
+@Retention(RetentionPolicy.RUNTIME)
+@Target(ElementType.TYPE)
+public @interface Two {
+    String first();
+    int second();
+}
+```
+
+### 2. Класс TwoAnnotation с аннотацией @Two
+
+- Аннотация на классе: `@Two(first="Значение строка", second=42)`
+
+```java
+@Two(first = "Значение строка", second = 42)
+public class TwoAnnotation { }
+```
+
+### 3. Обработчик TwoProcessor
+
+* Считывает аннотацию `@Two` и выводит значения `first` и `second`
+
+```java
+public class TwoProcessor {
+    public static void printTwoValues(Class<?> clazz) {
+        Two annotation = clazz.getAnnotation(Two.class);
+        if (annotation != null) {
+            System.out.println("Значение first: " + annotation.first());
+            System.out.println("Значение second: " + annotation.second());
+        }
+    }
+}
+```
+
+### 4. Главный класс Main
+
+* Передаёт класс `TwoAnnotation` в обработчик
+* Выводит значения аннотации
+
+```java
+public class Main {
+    public static void main(String[] args) {
+        TwoProcessor.printTwoValues(TwoAnnotation.class);
+    }
+}
+```
+
+### Результат работы программы
+
+```
+Значение first: Значение строка
+Значение second: 42
+```
+
+---
+
+## Задание 1.6. @Cache
+Разработайте аннотацию @Cache, со следующими характеристиками:
+- Целью может быть ТИП
+- Доступна во время исполнения программы
+- Имеет необязательное свойство value, типа String[]
+- Значение свойства по умолчанию: пустой массив
+Проаннотируйте класс аннотацией @Cache, указав несколько кешируемых областей.
+Создайте обработчик, который выводит список всех кешируемых областей или сообщение, что
+список пуст.
+### 1. Аннотация @Cache
+
+* Применяется только к классу (`@Target(ElementType.TYPE)`)
+* Доступна во время выполнения (`@Retention(RetentionPolicy.RUNTIME)`)
+* Свойство `value` — массив строк (по умолчанию пустой)
+
+```java
+@Retention(RetentionPolicy.RUNTIME)
+@Target(ElementType.TYPE)
+public @interface Cache {
+    String[] value() default {};
+}
+```
+
+### 2. Класс CacheAnnotation с аннотацией @Cache
+
+* Аннотация на классе: `@Cache({"users", "items", "products"})`
+
+```java
+@Cache({"users", "items", "products"})
+public class CacheAnnotation { }
+```
+
+### 3. Обработчик CacheProcessor
+
+* Выводит список кешируемых областей или сообщение о пустом списке
+
+```java
+public class CacheProcessor {
+    public static void printCacheAreas(Class<?> clazz) {
+        Cache annotation = clazz.getAnnotation(Cache.class);
+        if (annotation != null) {
+            String[] areas = annotation.value();
+            if (areas.length == 0) {
+                System.out.println("Список кешируемых областей пуст.");
+            } else {
+                System.out.println("Кешируемые области:");
+                for (String area : areas) {
+                    System.out.println("- " + area);
+                }
+            }
+        }
+    }
+}
+```
+
+### 4. Главный класс Main
+
+* Передаёт класс `CacheAnnotation` в обработчик
+* Выводит кешируемые области
+
+```java
+public class Main {
+    public static void main(String[] args) {
+        CacheProcessor.printCacheAreas(CacheAnnotation.class);
+    }
+}
+```
+
+### Результат работы программы
+
+```
+Кешируемые области:
+- users
+- items
+- products
+```
+
