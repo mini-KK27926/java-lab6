@@ -498,4 +498,67 @@ public class Main {
 - items
 - products
 ```
+## Задание 2.2. Тестирование методов с @Invoke
 
+### Цель
+Создать тест с использованием JUnit, который проверяет корректность вызова методов, отмеченных аннотацией `@Invoke`.
+
+---
+
+### 1. Структура теста
+
+- Класс `InvokeTestClass` с методами, помеченными `@Invoke` и флагами `boolean`, чтобы проверить, что метод был вызван:
+
+```java
+public class InvokeTestClass {
+    boolean method1Called = false;
+    boolean method3Called = false;
+
+    @Invoke
+    public void method1() { method1Called = true; }
+
+    public void method2() { }
+
+    @Invoke
+    public void method3() { method3Called = true; }
+}
+```
+### 2.JUnit тест InvokeProcessorTest
+    - Использует @BeforeEach для подготовки нового экземпляра объекта перед каждым тестом. 
+    - Использует Reflection API для проверки, что методы с аннотацией @Invoke существуют. 
+    - Проверяет, что методы выполняются без исключений. Проверяет побочные эффекты (флаги становятся true).
+```java
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import java.lang.reflect.Method;
+import static org.junit.jupiter.api.Assertions.*;
+
+public class InvokeProcessorTest {
+
+    private InvokeTestClass testObject;
+
+    @BeforeEach
+    void setUp() {
+        testObject = new InvokeTestClass();
+    }
+
+    @Test
+    void testInvokeMethodsExecution() {
+        assertFalse(testObject.method1Called);
+        assertFalse(testObject.method3Called);
+
+        Method[] methods = testObject.getClass().getDeclaredMethods();
+        int invokeCount = 0;
+        for (Method method : methods) {
+            if (method.isAnnotationPresent(Invoke.class)) {
+                invokeCount++;
+            }
+        }
+        assertEquals(2, invokeCount);
+
+        assertDoesNotThrow(() -> InvokeProcessor.processing(testObject));
+
+        assertTrue(testObject.method1Called);
+        assertTrue(testObject.method3Called);
+    }
+}
